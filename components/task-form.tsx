@@ -114,6 +114,7 @@ const AGENT_MODELS = {
     { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
   ],
   opencode: [
+    { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro' },
     { value: 'gpt-5', label: 'GPT-5' },
     { value: 'gpt-5-mini', label: 'GPT-5 mini' },
     { value: 'gpt-5-nano', label: 'GPT-5 nano' },
@@ -128,11 +129,11 @@ const AGENT_MODELS = {
 const DEFAULT_MODELS = {
   mojocodex: 'claude-sonnet-4-5-20250929',
   claude: 'claude-sonnet-4-5-20250929',
-  codex: 'openai/gpt-5.1',
+  codex: 'openai/gpt-5.1-codex',
   copilot: 'claude-sonnet-4.5',
   cursor: 'auto',
   gemini: 'gemini-3-pro-preview',
-  opencode: 'gpt-5',
+  opencode: 'gemini-3-pro-preview',
 } as const
 
 // API key requirements for each agent
@@ -150,6 +151,10 @@ type Provider = 'openai' | 'gemini' | 'cursor' | 'anthropic' | 'aigateway'
 
 // Helper to determine which API key is needed for opencode based on model
 const getOpenCodeRequiredKeys = (model: string): Provider[] => {
+  // Check if it's a Gemini model
+  if (model.includes('gemini')) {
+    return ['gemini']
+  }
   // Check if it's an Anthropic model (claude models)
   if (model.includes('claude') || model.includes('sonnet') || model.includes('opus')) {
     return ['anthropic']
