@@ -20,8 +20,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Mojocodex',
-  description:
-    'Mojo in Coding Agent Form"',
+  description: 'Mojo in Coding Agent Form"',
 }
 
 export default function RootLayout({
