@@ -296,12 +296,17 @@ Based on your `NEXT_PUBLIC_AUTH_PROVIDERS` configuration, you'll need to create 
 
 ### 5. Set up the database
 
-Generate and run database migrations:
+Apply database migrations to create the required schema:
 
 ```bash
-pnpm db:generate
+# Option 1: Run migrations programmatically (recommended for development)
+pnpm db:migrate:run
+
+# Option 2: Push schema directly to database (alternative)
 pnpm db:push
 ```
+
+> **Note**: `db:migrate:run` applies all pending migrations from the `lib/db/migrations` folder, while `db:push` syncs the schema directly without tracking migrations.
 
 ### 6. Start the development server
 
@@ -316,13 +321,16 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Database Operations
 
 ```bash
-# Generate migrations
+# Generate new migrations after schema changes
 pnpm db:generate
 
-# Push schema changes
+# Run pending migrations
+pnpm db:migrate:run
+
+# Push schema changes directly (alternative to migrations)
 pnpm db:push
 
-# Open Drizzle Studio
+# Open Drizzle Studio to view/edit data
 pnpm db:studio
 ```
 
