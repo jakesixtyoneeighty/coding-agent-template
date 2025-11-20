@@ -19,9 +19,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Coding Agent Template',
+  title: 'Mojocodex',
   description:
-    'AI-powered coding agent template supporting Claude Code, OpenAI Codex CLI, Cursor CLI, and opencode with Vercel Sandbox',
+    'Mojo in Coding Agent Form"',
 }
 
 export default function RootLayout({

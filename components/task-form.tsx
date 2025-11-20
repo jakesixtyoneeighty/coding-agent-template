@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Loader2, ArrowUp, Settings, X, Cable, Users } from 'lucide-react'
+import { Loader2, ArrowUp, Settings, X, Cable } from 'lucide-react'
 import { Claude, Codex, Copilot, Cursor, Gemini, OpenCode } from '@/components/logos'
 import { setInstallDependencies, setMaxDuration, setKeepAlive } from '@/lib/utils/cookies'
 import { useConnectors } from '@/components/connectors-provider'
@@ -57,92 +57,29 @@ interface TaskFormProps {
 }
 
 const CODING_AGENTS = [
-  { value: 'mojocodex', label: 'MojoCodex', icon: Codex, isLogo: true },
-  { value: 'divider', label: '', icon: () => null, isLogo: false, isDivider: true },
-  { value: 'multi-agent', label: 'Compare', icon: Users, isLogo: false },
-  { value: 'claude', label: 'Claude', icon: Claude, isLogo: true },
   { value: 'codex', label: 'Codex', icon: Codex, isLogo: true },
-  { value: 'copilot', label: 'Copilot', icon: Copilot, isLogo: true },
-  { value: 'cursor', label: 'Cursor', icon: Cursor, isLogo: true },
-  { value: 'gemini', label: 'Gemini', icon: Gemini, isLogo: true },
-  { value: 'opencode', label: 'opencode', icon: OpenCode, isLogo: true },
+  { value: 'claude', label: 'Claude', icon: Claude, isLogo: true },
+  { value: 'opencode', label: 'Opencode', icon: OpenCode, isLogo: true },
 ] as const
 
 // Model options for each agent
 const AGENT_MODELS = {
-  mojocodex: [
-    { value: 'claude-sonnet-4-5-20250929', label: 'Sonnet 4.5' },
-    { value: 'openai/gpt-5.1', label: 'GPT-5.1' },
-    { value: 'openai/gpt-5', label: 'GPT-5' },
-    { value: 'claude-opus-4-1-20250805', label: 'Opus 4.1' },
-  ],
-  claude: [
-    { value: 'claude-sonnet-4-5-20250929', label: 'Sonnet 4.5' },
-    { value: 'claude-haiku-4-5-20251001', label: 'Haiku 4.5' },
-    { value: 'claude-opus-4-1-20250805', label: 'Opus 4.1' },
-    { value: 'claude-sonnet-4-20250514', label: 'Sonnet 4' },
-  ],
-  codex: [
-    { value: 'openai/gpt-5.1', label: 'GPT-5.1' },
-    { value: 'openai/gpt-5.1-codex', label: 'GPT-5.1-Codex' },
-    { value: 'openai/gpt-5.1-codex-mini', label: 'GPT-5.1-Codex mini' },
-    { value: 'openai/gpt-5', label: 'GPT-5' },
-    { value: 'gpt-5-codex', label: 'GPT-5-Codex' },
-    { value: 'openai/gpt-5-mini', label: 'GPT-5 mini' },
-    { value: 'openai/gpt-5-nano', label: 'GPT-5 nano' },
-    { value: 'gpt-5-pro', label: 'GPT-5 pro' },
-    { value: 'openai/gpt-4.1', label: 'GPT-4.1' },
-  ],
-  copilot: [
-    { value: 'claude-sonnet-4.5', label: 'Sonnet 4.5' },
-    { value: 'claude-sonnet-4', label: 'Sonnet 4' },
-    { value: 'claude-haiku-4.5', label: 'Haiku 4.5' },
-    { value: 'gpt-5', label: 'GPT-5' },
-  ],
-  cursor: [
-    { value: 'auto', label: 'Auto' },
-    { value: 'composer-1', label: 'Composer' },
-    { value: 'sonnet-4.5', label: 'Sonnet 4.5' },
-    { value: 'sonnet-4.5-thinking', label: 'Sonnet 4.5 Thinking' },
-    { value: 'gpt-5', label: 'GPT-5' },
-    { value: 'gpt-5-codex', label: 'GPT-5 Codex' },
-    { value: 'opus-4.1', label: 'Opus 4.1' },
-    { value: 'grok', label: 'Grok' },
-  ],
-  gemini: [
-    { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro' },
-    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
-  ],
-  opencode: [
-    { value: 'gpt-5', label: 'GPT-5' },
-    { value: 'gpt-5-mini', label: 'GPT-5 mini' },
-    { value: 'gpt-5-nano', label: 'GPT-5 nano' },
-    { value: 'gpt-4.1', label: 'GPT-4.1' },
-    { value: 'claude-sonnet-4-5-20250929', label: 'Sonnet 4.5' },
-    { value: 'claude-sonnet-4-20250514', label: 'Sonnet 4' },
-    { value: 'claude-opus-4-1-20250805', label: 'Opus 4.1' },
-  ],
+  codex: [{ value: 'gpt-5.1-codex', label: 'GPT-5.1-Codex' }],
+  claude: [{ value: 'claude-sonnet-4-5-20250929', label: 'Sonnet 4.5' }],
+  opencode: [{ value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro' }],
 } as const
 
 // Default models for each agent
 const DEFAULT_MODELS = {
-  mojocodex: 'claude-sonnet-4-5-20250929',
+  codex: 'gpt-5.1-codex',
   claude: 'claude-sonnet-4-5-20250929',
-  codex: 'openai/gpt-5.1',
-  copilot: 'claude-sonnet-4.5',
-  cursor: 'auto',
-  gemini: 'gemini-3-pro-preview',
-  opencode: 'gpt-5',
+  opencode: 'gemini-3-pro-preview',
 } as const
 
 // API key requirements for each agent
 const AGENT_API_KEY_REQUIREMENTS: Record<string, Provider[]> = {
-  mojocodex: [], // Will be determined dynamically based on selected model
   claude: ['anthropic'],
   codex: ['aigateway'], // Uses AI Gateway for OpenAI proxy
-  copilot: [], // Uses user's GitHub account token automatically
-  cursor: ['cursor'],
-  gemini: ['gemini'],
   opencode: [], // Will be determined dynamically based on selected model
 }
 
@@ -150,6 +87,10 @@ type Provider = 'openai' | 'gemini' | 'cursor' | 'anthropic' | 'aigateway'
 
 // Helper to determine which API key is needed for opencode based on model
 const getOpenCodeRequiredKeys = (model: string): Provider[] => {
+  // Check if it's a Gemini model
+  if (model.includes('gemini')) {
+    return ['gemini']
+  }
   // Check if it's an Anthropic model (claude models)
   if (model.includes('claude') || model.includes('sonnet') || model.includes('opus')) {
     return ['anthropic']
@@ -174,9 +115,11 @@ export function TaskForm({
 }: TaskFormProps) {
   const [prompt, setPrompt] = useAtom(taskPromptAtom)
   const [savedAgent, setSavedAgent] = useAtom(lastSelectedAgentAtom)
-  const [selectedAgent, setSelectedAgent] = useState(savedAgent || 'mojocodex')
-  const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODELS.mojocodex)
-  const [selectedModels, setSelectedModels] = useState<string[]>([])
+  const defaultAgent = 'codex'
+  const [selectedAgent, setSelectedAgent] = useState<string>(
+    savedAgent && CODING_AGENTS.some((agent) => agent.value === savedAgent) ? savedAgent : defaultAgent,
+  )
+  const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODELS[defaultAgent])
   const [repos, setRepos] = useAtom(githubReposAtomFamily(selectedOwner))
   const [, setLoadingRepos] = useState(false)
 
@@ -272,11 +215,6 @@ export function TaskForm({
   // Update model when agent changes
   useEffect(() => {
     if (selectedAgent) {
-      // Clear selectedModels when switching away from multi-agent
-      if (selectedAgent !== 'multi-agent') {
-        setSelectedModels([])
-      }
-
       // Load saved model for this agent or use default
       const agentModels = AGENT_MODELS[selectedAgent as keyof typeof AGENT_MODELS]
       if (savedModel && agentModels?.some((model) => model.value === savedModel)) {
@@ -327,12 +265,6 @@ export function TaskForm({
       return
     }
 
-    // Validate that multi-agent mode has at least one model selected
-    if (selectedAgent === 'multi-agent' && selectedModels.length === 0) {
-      toast.error('Please select at least one model for multi-agent mode')
-      return
-    }
-
     // If owner/repo not selected, let parent handle it (will show sign-in if needed)
     // Don't clear localStorage here - user might need to sign in and come back
     if (!selectedOwner || !selectedRepo) {
@@ -341,7 +273,6 @@ export function TaskForm({
         repoUrl: '',
         selectedAgent,
         selectedModel,
-        selectedModels: selectedAgent === 'multi-agent' ? selectedModels : undefined,
         installDependencies,
         maxDuration,
         keepAlive,
@@ -350,10 +281,10 @@ export function TaskForm({
     }
 
     // Check if API key is required and available for the selected agent and model
-    // Skip this check if we don't have repo data (likely not signed in) or if multi-agent mode
+    // Skip this check if we don't have repo data (likely not signed in)
     const selectedRepoData = repos?.find((repo) => repo.name === selectedRepo)
 
-    if (selectedRepoData && selectedAgent !== 'multi-agent') {
+    if (selectedRepoData) {
       try {
         const response = await fetch(`/api/api-keys/check?agent=${selectedAgent}&model=${selectedModel}`)
         const data = await response.json()
@@ -385,7 +316,6 @@ export function TaskForm({
       repoUrl: selectedRepoData?.clone_url || '',
       selectedAgent,
       selectedModel,
-      selectedModels: selectedAgent === 'multi-agent' ? selectedModels : undefined,
       installDependencies,
       maxDuration,
       keepAlive,
@@ -472,73 +402,26 @@ export function TaskForm({
                 </Select>
 
                 {/* Model Selection - Fills available width on mobile */}
-                {selectedAgent === 'multi-agent' ? (
-                  <Select value="multi-select" onValueChange={() => {}} disabled={isSubmitting}>
-                    <SelectTrigger className="flex-1 sm:flex-none sm:w-auto sm:min-w-[140px] border-0 bg-transparent shadow-none focus:ring-0 h-8 min-w-0">
-                      <SelectValue>
-                        {selectedModels.length === 0 ? 'Select models' : `${selectedModels.length} Selected`}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CODING_AGENTS.filter((agent) => agent.value !== 'multi-agent').map((agent) => (
-                        <div key={agent.value}>
-                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{agent.label}</div>
-                          {AGENT_MODELS[agent.value as keyof typeof AGENT_MODELS]?.map((model) => {
-                            const fullValue = `${agent.value}:${model.value}`
-                            const isSelected = selectedModels.includes(fullValue)
-                            return (
-                              <div
-                                key={fullValue}
-                                className="relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  setSelectedModels((prev) =>
-                                    isSelected ? prev.filter((m) => m !== fullValue) : [...prev, fullValue],
-                                  )
-                                }}
-                              >
-                                <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-                                  {isSelected && (
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M5 13l4 4L19 7"
-                                      />
-                                    </svg>
-                                  )}
-                                </span>
-                                {model.label}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Select
-                    value={selectedModel}
-                    onValueChange={(value) => {
-                      setSelectedModel(value)
-                      // Save to Jotai atom immediately
-                      setSavedModel(value)
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    <SelectTrigger className="flex-1 sm:flex-none sm:w-auto sm:min-w-[140px] border-0 bg-transparent shadow-none focus:ring-0 h-8 min-w-0">
-                      <SelectValue placeholder="Model" className="truncate" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {AGENT_MODELS[selectedAgent as keyof typeof AGENT_MODELS]?.map((model) => (
-                        <SelectItem key={model.value} value={model.value}>
-                          {model.label}
-                        </SelectItem>
-                      )) || []}
-                    </SelectContent>
-                  </Select>
-                )}
+                <Select
+                  value={selectedModel}
+                  onValueChange={(value) => {
+                    setSelectedModel(value)
+                    // Save to Jotai atom immediately
+                    setSavedModel(value)
+                  }}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger className="flex-1 sm:flex-none sm:w-auto sm:min-w-[140px] border-0 bg-transparent shadow-none focus:ring-0 h-8 min-w-0">
+                    <SelectValue placeholder="Model" className="truncate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AGENT_MODELS[selectedAgent as keyof typeof AGENT_MODELS]?.map((model) => (
+                      <SelectItem key={model.value} value={model.value}>
+                        {model.label}
+                      </SelectItem>
+                    )) || []}
+                  </SelectContent>
+                </Select>
 
                 {/* Option Chips - Only visible on desktop */}
                 {(!installDependencies || maxDuration !== maxSandboxDuration || keepAlive) && (
@@ -735,13 +618,6 @@ export function TaskForm({
           </div>
         </div>
 
-        {/* Multi-Agent Info */}
-        {selectedAgent === 'multi-agent' && selectedModels.length > 0 && (
-          <div className="mt-2 text-xs text-muted-foreground text-center">
-            This will create {selectedModels.length} separate task{selectedModels.length > 1 ? 's' : ''} (one for each
-            selected model)
-          </div>
-        )}
       </form>
 
       <ConnectorDialog open={showMcpServersDialog} onOpenChange={setShowMcpServersDialog} />
