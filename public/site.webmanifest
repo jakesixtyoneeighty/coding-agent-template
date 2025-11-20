@@ -1,6 +1,7 @@
 {
-    "name": "Coding Agent Platform",
-    "short_name": "Coding Agent Platform",
+    "name": "MojoCodex",
+    "short_name": "MojoCode",
+    "description": "Premium AI coding control center with multi-agent intelligence",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -15,5 +16,7 @@
     ],
     "theme_color": "#ffffff",
     "background_color": "#000000",
-    "display": "standalone"
+    "display": "standalone",
+    "start_url": "/",
+    "scope": "/"
 }
