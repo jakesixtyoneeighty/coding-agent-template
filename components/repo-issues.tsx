@@ -40,18 +40,18 @@ const AGENT_MODELS = {
 
   ],
   codex: [
-     { value: 'openai/gpt-5.1-codex', label: 'GPT-5.1-Codex' },
-   
+    { value: 'openai/gpt-5.1-codex', label: 'GPT-5.1-Codex' },
   ],
  
   opencode: [
     { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro' },
   
+  ],
 } as const
 
 const DEFAULT_MODELS = {
   claude: 'claude-sonnet-4-5-20250929',
-  codex: 'openai/gpt-5.1',
+  codex: 'openai/gpt-5.1-codex',
   opencode: 'gemini-3-pro-preview',
  
 } as const
