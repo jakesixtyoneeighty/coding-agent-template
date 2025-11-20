@@ -235,6 +235,8 @@ export function TaskDetails({ task, maxSandboxDuration = 300 }: TaskDetailsProps
     if (correctModel !== selectedModel) {
       setSelectedModel(correctModel)
     }
+    // AGENT_MODELS and DEFAULT_MODELS are stable module-level constants
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAgent, task.selectedModel, selectedModel])
 
   // File search state
@@ -464,55 +466,61 @@ export function TaskDetails({ task, maxSandboxDuration = 300 }: TaskDetailsProps
     setLoadedFileHashes((prev) => ({ ...prev, [filename]: hash }))
   }, [])
 
-  const attemptCloseTab = (index: number, e?: React.MouseEvent) => {
-    e?.stopPropagation()
-    const currentTabs = openTabsByMode[viewMode]
-    const fileToClose = currentTabs[index]
+  const closeTab = useCallback(
+    (index: number) => {
+      const currentTabs = openTabsByMode[viewMode]
+      const currentActiveIndex = activeTabIndexByMode[viewMode]
+      const fileToClose = currentTabs[index]
+      const newTabs = currentTabs.filter((_, i) => i !== index)
 
-    // Check if the tab has unsaved changes
-    if (tabsWithUnsavedChanges.has(fileToClose)) {
-      setTabToClose(index)
-      setShowCloseTabDialog(true)
-    } else {
-      closeTab(index)
-    }
-  }
+      setOpenTabsByMode((prev) => ({ ...prev, [viewMode]: newTabs }))
 
-  const closeTab = (index: number) => {
-    const currentTabs = openTabsByMode[viewMode]
-    const currentActiveIndex = activeTabIndexByMode[viewMode]
-    const fileToClose = currentTabs[index]
-    const newTabs = currentTabs.filter((_, i) => i !== index)
+      // Remove from unsaved changes
+      setTabsWithUnsavedChanges((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(fileToClose)
+        return newSet
+      })
 
-    setOpenTabsByMode((prev) => ({ ...prev, [viewMode]: newTabs }))
+      // Adjust active tab index
+      if (newTabs.length === 0) {
+        setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: 0 }))
+        setSelectedFileByMode((prev) => ({ ...prev, [viewMode]: undefined }))
+        setSelectedItemIsFolderByMode((prev) => ({ ...prev, [viewMode]: false }))
+      } else if (currentActiveIndex >= newTabs.length) {
+        setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: newTabs.length - 1 }))
+        setSelectedFileByMode((prev) => ({ ...prev, [viewMode]: newTabs[newTabs.length - 1] }))
+        setSelectedItemIsFolderByMode((prev) => ({ ...prev, [viewMode]: false }))
+      } else if (currentActiveIndex === index) {
+        // If closing the active tab, switch to the previous tab (or next if it's the first)
+        const newIndex = Math.max(0, index - 1)
+        setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: newIndex }))
+        setSelectedFileByMode((prev) => ({ ...prev, [viewMode]: newTabs[newIndex] }))
+        setSelectedItemIsFolderByMode((prev) => ({ ...prev, [viewMode]: false }))
+      } else if (currentActiveIndex > index) {
+        // Adjust index if a tab before the active one was closed
+        setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: currentActiveIndex - 1 }))
+      }
+    },
+    [openTabsByMode, activeTabIndexByMode, viewMode],
+  )
 
-    // Remove from unsaved changes
-    setTabsWithUnsavedChanges((prev) => {
-      const newSet = new Set(prev)
-      newSet.delete(fileToClose)
-      return newSet
-    })
+  const attemptCloseTab = useCallback(
+    (index: number, e?: React.MouseEvent) => {
+      e?.stopPropagation()
+      const currentTabs = openTabsByMode[viewMode]
+      const fileToClose = currentTabs[index]
 
-    // Adjust active tab index
-    if (newTabs.length === 0) {
-      setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: 0 }))
-      setSelectedFileByMode((prev) => ({ ...prev, [viewMode]: undefined }))
-      setSelectedItemIsFolderByMode((prev) => ({ ...prev, [viewMode]: false }))
-    } else if (currentActiveIndex >= newTabs.length) {
-      setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: newTabs.length - 1 }))
-      setSelectedFileByMode((prev) => ({ ...prev, [viewMode]: newTabs[newTabs.length - 1] }))
-      setSelectedItemIsFolderByMode((prev) => ({ ...prev, [viewMode]: false }))
-    } else if (currentActiveIndex === index) {
-      // If closing the active tab, switch to the previous tab (or next if it's the first)
-      const newIndex = Math.max(0, index - 1)
-      setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: newIndex }))
-      setSelectedFileByMode((prev) => ({ ...prev, [viewMode]: newTabs[newIndex] }))
-      setSelectedItemIsFolderByMode((prev) => ({ ...prev, [viewMode]: false }))
-    } else if (currentActiveIndex > index) {
-      // Adjust index if a tab before the active one was closed
-      setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: currentActiveIndex - 1 }))
-    }
-  }
+      // Check if the tab has unsaved changes
+      if (tabsWithUnsavedChanges.has(fileToClose)) {
+        setTabToClose(index)
+        setShowCloseTabDialog(true)
+      } else {
+        closeTab(index)
+      }
+    },
+    [openTabsByMode, viewMode, tabsWithUnsavedChanges, closeTab],
+  )
 
   const handleCloseTabConfirm = (save: boolean) => {
     if (tabToClose === null) return
@@ -538,12 +546,15 @@ export function TaskDetails({ task, maxSandboxDuration = 300 }: TaskDetailsProps
     }
   }
 
-  const switchToTab = (index: number) => {
-    const currentTabs = openTabsByMode[viewMode]
-    setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: index }))
-    setSelectedFileByMode((prev) => ({ ...prev, [viewMode]: currentTabs[index] }))
-    setSelectedItemIsFolderByMode((prev) => ({ ...prev, [viewMode]: false }))
-  }
+  const switchToTab = useCallback(
+    (index: number) => {
+      const currentTabs = openTabsByMode[viewMode]
+      setActiveTabIndexByMode((prev) => ({ ...prev, [viewMode]: index }))
+      setSelectedFileByMode((prev) => ({ ...prev, [viewMode]: currentTabs[index] }))
+      setSelectedItemIsFolderByMode((prev) => ({ ...prev, [viewMode]: false }))
+    },
+    [openTabsByMode, viewMode],
+  )
 
   // Use optimistic status if available, otherwise use actual task status
   const currentStatus = optimisticStatus || task.status
@@ -590,7 +601,7 @@ export function TaskDetails({ task, maxSandboxDuration = 300 }: TaskDetailsProps
     }, 60000) // 60 seconds
 
     return () => clearInterval(interval)
-  }, [currentStatus, task.keepAlive, task.createdAt])
+  }, [currentStatus, task.keepAlive, task.createdAt, task.maxDuration])
 
   // Periodic sandbox health check
   useEffect(() => {
@@ -1048,7 +1059,7 @@ export function TaskDetails({ task, maxSandboxDuration = 300 }: TaskDetailsProps
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [openTabs, activeTabIndex])
+  }, [openTabs, activeTabIndex, attemptCloseTab, switchToTab])
 
   // Trigger refresh when task completes
   useEffect(() => {
@@ -1079,6 +1090,8 @@ export function TaskDetails({ task, maxSandboxDuration = 300 }: TaskDetailsProps
         setSelectedModel(defaultModel)
       }
     }
+    // AGENT_MODELS and DEFAULT_MODELS are stable module-level constants
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAgent])
 
   // Scroll active tab into view when it changes
