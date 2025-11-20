@@ -35,25 +35,16 @@ const CODING_AGENTS = [
 ] as const
 
 const AGENT_MODELS = {
-  claude: [
-    { value: 'claude-sonnet-4-5-20250929', label: 'Sonnet 4.5' },
+  claude: [{ value: 'claude-sonnet-4-5-20250929', label: 'Sonnet 4.5' }],
+  codex: [{ value: 'openai/gpt-5.1-codex', label: 'GPT-5.1-Codex' }],
 
-  ],
-  codex: [
-    { value: 'openai/gpt-5.1-codex', label: 'GPT-5.1-Codex' },
-  ],
- 
-  opencode: [
-    { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro' },
-  
-  ],
+  opencode: [{ value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro' }],
 } as const
 
 const DEFAULT_MODELS = {
   claude: 'claude-sonnet-4-5-20250929',
   codex: 'openai/gpt-5.1-codex',
   opencode: 'gemini-3-pro-preview',
- 
 } as const
 
 function formatDistanceToNow(date: Date): string {

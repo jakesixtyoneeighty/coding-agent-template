@@ -408,7 +408,8 @@ export function TaskForm({
         </div>
         <h1 className="text-5xl md:text-6xl font-bold mb-6">Build. Cool. Shit.</h1>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto px-4">
-          Mojo and his team of jaded, and annoyed agents totally dominate your project. Add a feature. Fix a bug. What does it matter? A prompt is all you have to worry about. The crew is doing all the work.
+          Mojo and his team of jaded, and annoyed agents totally dominate your project. Add a feature. Fix a bug. What
+          does it matter? A prompt is all you have to worry about. The crew is doing all the work.
         </p>
       </div>
 
